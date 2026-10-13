@@ -1,0 +1,804 @@
+<!doctype html>
+<html lang="ru">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Роадмап запуска OF-агентства</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&family=Unbounded:wght@500;600&family=JetBrains+Mono:wght@500&display=swap">
+<style>
+/* Layout: hero with a three-stage overview, then three stages of collapsed blocks; a compact stage bar appears once the overview scrolls away */
+:root {
+  --bg: #f3f5f7;
+  --surface: #ffffff;
+  --fg: #12202b;
+  --muted: #5a6b78;
+  --line: #d7dee4;
+  --accent: #0b6e66;
+  --accent-soft: #dcefec;
+  --accent-ink: #ffffff;
+  --font-display: "Unbounded", "Manrope", system-ui, sans-serif;
+  --font-body: "Manrope", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0e171d;
+    --surface: #15222a;
+    --fg: #e8eef2;
+    --muted: #93a5b1;
+    --line: #26363f;
+    --accent: #3fd0c0;
+    --accent-soft: #123a3a;
+    --accent-ink: #06201d;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0e171d;
+  --surface: #15222a;
+  --fg: #e8eef2;
+  --muted: #93a5b1;
+  --line: #26363f;
+  --accent: #3fd0c0;
+  --accent-soft: #123a3a;
+  --accent-ink: #06201d;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+body {
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font-body);
+  font-size: 16px;
+  line-height: 1.55;
+  padding-inline: 16px;
+  padding-block: 0 72px;
+}
+.wrap { max-width: 980px; margin-inline: auto; }
+h1, h2, h3, h4 { margin: 0; text-wrap: balance; }
+ul { margin: 0; padding: 0; list-style: none; }
+button { font: inherit; color: inherit; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+[hidden] { display: none !important; }
+
+/* hero */
+.hero { padding-block: 56px 8px; }
+.eyebrow {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+.hero h1 {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: clamp(28px, 5.4vw, 52px);
+  line-height: 1.12;
+  margin-top: 14px;
+}
+.nowrap { white-space: nowrap; }
+.goal { max-width: 62ch; margin: 18px 0 0; font-size: 18px; color: var(--muted); }
+
+/* overview: widths follow the length of each stage */
+.overview {
+  display: grid;
+  grid-template-columns: 4fr 6fr 3fr;
+  gap: 12px;
+  margin-top: 36px;
+}
+.ov {
+  min-width: 0;
+  text-align: left;
+  background: transparent;
+  border: 0;
+  border-top: 6px solid var(--accent);
+  padding: 14px 4px 0 0;
+  cursor: pointer;
+}
+.ov:nth-child(3) { border-top-style: dashed; }
+.ov small {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.ov h2 {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: clamp(18px, 2.4vw, 24px);
+  line-height: 1.2;
+  margin-top: 6px;
+}
+.ov p { margin: 8px 0 0; font-size: 15px; color: var(--muted); }
+.ov:hover h2 { color: var(--accent); }
+
+/* compact stage bar, shown after the overview scrolls away */
+.timeline-bar {
+  position: fixed;
+  inset-inline: 0;
+  top: 0;
+  z-index: 10;
+  background: var(--bg);
+  border-bottom: 1px solid var(--line);
+  padding: calc(10px + env(safe-area-inset-top, 0px)) 16px 10px;
+  transform: translateY(-110%);
+  visibility: hidden;
+  transition: transform 0.2s, visibility 0.2s;
+}
+.timeline-bar.show { transform: none; visibility: visible; }
+.timeline { max-width: 980px; margin-inline: auto; }
+.tl-stages {
+  display: grid;
+  grid-template-columns: 4fr 6fr 2fr;
+  gap: 4px;
+}
+.tl-stage {
+  min-width: 0;
+  text-align: left;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 8px 10px;
+  cursor: pointer;
+  line-height: 1.25;
+}
+.tl-stage small {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.tl-stage span { font-weight: 600; font-size: 14px; overflow-wrap: anywhere; }
+.tl-stage[aria-current="true"] {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--accent-ink);
+}
+.tl-stage[aria-current="true"] small { color: inherit; opacity: 0.85; }
+.tl-weeks {
+  display: grid;
+  grid-template-columns: 4fr 6fr 2fr;
+  gap: 4px;
+  margin-top: 6px;
+}
+.tl-weeks > div { display: flex; gap: 2px; }
+.tl-weeks i {
+  flex: 1;
+  font-style: normal;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  text-align: center;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+  border-top: 2px solid var(--line);
+  padding-top: 3px;
+}
+
+/* stage */
+.stage { padding-top: 56px; scroll-margin-top: 110px; }
+.stage-head { display: grid; gap: 8px; }
+.stage-tag {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+.stage-head h2 {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: clamp(22px, 3.6vw, 32px);
+  line-height: 1.2;
+}
+.stage-goal { margin: 0; max-width: 64ch; color: var(--muted); font-size: 17px; }
+
+/* blocks */
+.toolbar { display: flex; justify-content: flex-end; margin-top: 40px; }
+.tool-btn {
+  background: transparent;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 6px 12px;
+  font-size: 14px;
+  color: var(--muted);
+  cursor: pointer;
+}
+.tool-btn:hover { color: var(--fg); border-color: var(--accent); }
+.blocks { margin-top: 28px; position: relative; display: grid; gap: 12px; }
+.blocks::before {
+  content: "";
+  position: absolute;
+  left: 21px;
+  top: 24px;
+  bottom: 24px;
+  width: 2px;
+  background: var(--line);
+}
+.block { position: relative; }
+.block-btn {
+  position: relative;
+  width: 100%;
+  display: grid;
+  grid-template-columns: 44px 1fr auto 20px;
+  gap: 0 14px;
+  align-items: center;
+  text-align: left;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 12px 16px 12px 0;
+  cursor: pointer;
+}
+.block-btn:hover { border-color: var(--accent); }
+.node {
+  justify-self: center;
+  width: 44px;
+  height: 44px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--accent);
+  color: var(--accent-ink);
+  font-family: var(--font-mono);
+  font-size: 14px;
+  margin-left: -1px;
+}
+.b-title { min-width: 0; }
+.b-title h3 { font-size: 17px; font-weight: 700; line-height: 1.3; }
+.b-title p { margin: 2px 0 0; font-size: 14px; color: var(--muted); }
+.b-week {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--accent);
+  background: var(--accent-soft);
+  border-radius: 999px;
+  padding: 3px 10px;
+  white-space: nowrap;
+}
+.chev {
+  width: 10px;
+  height: 10px;
+  border-right: 2px solid var(--muted);
+  border-bottom: 2px solid var(--muted);
+  transform: rotate(45deg);
+  transition: transform 0.2s;
+  justify-self: center;
+  margin-top: -4px;
+}
+.block-btn[aria-expanded="true"] .chev { transform: rotate(-135deg); margin-top: 4px; }
+.panel {
+  margin: 8px 0 8px 58px;
+  display: grid;
+  gap: 22px;
+  padding: 20px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+}
+.key {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: clamp(18px, 2.6vw, 22px);
+  line-height: 1.3;
+  text-wrap: balance;
+  color: var(--accent);
+}
+.key small {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+.b-title p.pit { color: var(--fg); font-weight: 600; }
+.b-title p.pit b { color: var(--accent); font-weight: 700; }
+.closing { padding-top: 56px; }
+.pits { display: grid; gap: 10px; margin-top: 24px; max-width: 64ch; }
+.pits li {
+  display: grid;
+  grid-template-columns: 44px 1fr;
+  gap: 12px;
+  align-items: baseline;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 12px 14px;
+}
+.pits li span {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: var(--accent);
+}
+.verdict {
+  max-width: 34ch;
+  margin: 32px 0 0;
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: clamp(20px, 3vw, 28px);
+  line-height: 1.3;
+  text-wrap: balance;
+}
+.group h4 {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 10px;
+  font-weight: 500;
+}
+.group li {
+  position: relative;
+  padding-left: 18px;
+  margin-top: 8px;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.group li:first-child { margin-top: 0; }
+.group li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.62em;
+  width: 8px;
+  height: 2px;
+  background: var(--accent);
+}
+.group li b { font-weight: 700; }
+.steps {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 4px;
+  align-items: center;
+}
+.steps span {
+  background: var(--accent-soft);
+  color: var(--fg);
+  border-radius: 6px;
+  padding: 4px 10px;
+  font-size: 14px;
+  font-weight: 600;
+}
+.steps i { font-style: normal; color: var(--muted); }
+.profit {
+  margin: 0;
+  padding: 10px 14px;
+  border-left: 3px solid var(--accent);
+  background: var(--accent-soft);
+  border-radius: 0 6px 6px 0;
+  font-weight: 600;
+}
+
+@media (max-width: 640px) {
+  .overview { grid-template-columns: 1fr; gap: 18px; }
+  .ov { padding-top: 12px; }
+  .block-btn { grid-template-columns: 44px 1fr 20px; }
+  .b-week { grid-column: 2; grid-row: 2; justify-self: start; margin-top: 6px; }
+  .chev { grid-row: 1; grid-column: 3; }
+  .panel { margin-left: 0; padding: 16px; }
+  .blocks::before { display: none; }
+  .tl-stages { grid-template-columns: 1fr 1fr 1fr; }
+  .tl-weeks { display: none; }
+  .tl-stage { padding: 6px 8px; }
+  .tl-stage span { font-size: 13px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .chev, .timeline-bar { transition: none; }
+}
+</style>
+
+<div class="wrap">
+  <header class="hero">
+    <div class="eyebrow">Роадмап · 10 недель</div>
+    <h1>Запуск <span class="nowrap">OF-агентства</span></h1>
+    <p class="goal">Со стороны открыть агентство кажется просто: найти модель, вложиться в рекламу, считать прибыль. На деле на каждом шаге есть подводные камни, на которых теряют деньги, время и нервы. Ниже: из каких шагов состоит запуск и где эти камни.</p>
+
+    <nav class="overview" id="overview" aria-label="Три этапа">
+      <button class="ov" type="button" data-target="stage1">
+        <small>Недели 1–4</small>
+        <h2>Фундамент</h2>
+        <p>Модель найдена, сделка защищена, инфраструктура готова</p>
+      </button>
+      <button class="ov" type="button" data-target="stage2">
+        <small>Недели 5–10</small>
+        <h2>Запуск</h2>
+        <p>Отдел продаж собран, трафик запущен, касса идёт</p>
+      </button>
+      <button class="ov" type="button" data-target="stage3">
+        <small>С 11-й недели</small>
+        <h2>Рост</h2>
+        <p>Автономность и кратный рост: от 2 моделей до 4+</p>
+      </button>
+    </nav>
+  </header>
+</div>
+
+<div class="timeline-bar" id="stageBar">
+  <div class="timeline">
+    <div class="tl-stages" role="group" aria-label="Этапы">
+      <button class="tl-stage" data-target="stage1" type="button"><small>Этап 1</small><span>Фундамент</span></button>
+      <button class="tl-stage" data-target="stage2" type="button"><small>Этап 2</small><span>Запуск</span></button>
+      <button class="tl-stage" data-target="stage3" type="button"><small>Этап 3</small><span>Рост</span></button>
+    </div>
+    <div class="tl-weeks" aria-hidden="true">
+      <div><i>1</i><i>2</i><i>3</i><i>4</i></div>
+      <div><i>5</i><i>6</i><i>7</i><i>8</i><i>9</i><i>10</i></div>
+      <div><i>11+</i></div>
+    </div>
+  </div>
+</div>
+
+<main class="wrap">
+  <div class="toolbar"><button class="tool-btn" id="toggleAll" type="button">Развернуть все блоки</button></div>
+
+  <!-- ЭТАП 1 -->
+  <section class="stage" id="stage1" style="padding-top:24px">
+    <div class="stage-head">
+      <div class="stage-tag">Этап 1 · недели 1–4</div>
+      <h2>Фундамент и безопасность</h2>
+      <p class="stage-goal">Найти актив (модель), обезопасить сделку и подготовить инфраструктуру.</p>
+    </div>
+    <div class="blocks">
+
+      <div class="block">
+        <button class="block-btn" type="button" aria-expanded="false" aria-controls="p1" id="h1">
+          <span class="node">Б1</span>
+          <span class="b-title"><h3>Скаутинг и отбор</h3><p class="pit"><b>Подводный камень:</b> ошибка в выборе модели</p></span>
+          <span class="b-week">неделя 1</span><span class="chev"></span>
+        </button>
+        <div class="panel" id="p1" role="region" aria-labelledby="h1" hidden>
+          <p class="key"><small>Подводный камень</small>Спешка на старте — самый дорогой способ убить проект</p>
+          <div class="group">
+            <h4>Что делаем на неделе 1</h4>
+            <ul>
+              <li>Обучение тому, как и где правильно искать моделей</li>
+              <li><b>Юридическая база:</b> контракты и договоры, условия сотрудничества</li>
+              <li>Обучение циклам работы с моделями</li>
+              <li>Старт обучения тимлида вашей команды чатеров</li>
+            </ul>
+          </div>
+          <div class="group">
+            <h4>Источники трафика моделей</h4>
+            <ul>
+              <li><b>Маркетплейсы и скауты:</b> быстро, но нужен жёсткий контроль</li>
+              <li><b>Instagram / TikTok:</b> поиск по lifestyle-контенту без спонсоров</li>
+              <li><b>Reddit / Telegram-каналы:</b> для СНГ и новичков</li>
+            </ul>
+          </div>
+          <div class="group">
+            <h4>Ключевые факторы отбора (внешность вторична)</h4>
+            <ul>
+              <li><b>Реальная мотивация к деньгам:</b> если девушке достаточно 500 долларов в месяц, она работает только под настроение</li>
+              <li><b>Управляемость:</b> если модель сменила пять агентств, считая всех виноватыми, или страдает звёздной болезнью, системный бизнес с ней не построить</li>
+              <li><b>Дисциплина:</b> на запуске модель на связи нон-стоп, снимает много и вовремя; пропадания на выходные означают провал</li>
+              <li><b>Технические условия:</b> хороший свет, фон, нет основной работы</li>
+              <li><b>Отсутствие «стопов»:</b> парень не мешает, мало табу, готова на видео и стримы</li>
+              <li><b>Наличие изюминки:</b> специфическое хобби или фетиш для ЦА</li>
+            </ul>
+          </div>
+          <div class="group">
+            <h4>Чем грозит неверный выбор</h4>
+            <ul>
+              <li><b>Прямой слив бюджета:</b> вы платите за продакшен и первый трафик, а модель не выходит на связь</li>
+              <li><b>Разрушение команды:</b> операторам и закупщикам нечего продавать, они сидят без денег, мотивация падает</li>
+              <li><b>Потеря LTV:</b> когда «кит» просит кастомное фото за крупную сумму, а модель пропала, он уходит, и вы теряете самую маржинальную часть бизнеса</li>
+            </ul>
+          </div>
+          <div class="group">
+            <h4>Защита инвестиций при покупке</h4>
+            <ul>
+              <li>Работа <b>только через гаранта</b></li>
+              <li>Рекламу запускаем, только когда на 100% уверены в модели</li>
+              <li>Чёткие условия манибэка и замены модели</li>
+              <li><b>Защита от фейков:</b> запрос live-видео (проходка в полный рост, разговор голосом)</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="block">
+        <button class="block-btn" type="button" aria-expanded="false" aria-controls="p2" id="h2">
+          <span class="node">Б2</span>
+          <span class="b-title"><h3>Онбординг и психология</h3><p>Первое касание с моделью</p></span>
+          <span class="b-week">первый контакт</span><span class="chev"></span>
+        </button>
+        <div class="panel" id="p2" role="region" aria-labelledby="h2" hidden>
+          <p class="key"><small>Ключевое</small>Никаких обещаний «миллионов завтра»</p>
+          <div class="group">
+            <h4>Позиционирование</h4>
+            <ul><li>Общение с позиции бизнес-партнёра и продюсера, а не фаната</li></ul>
+          </div>
+          <div class="group">
+            <h4>Закрытие страхов модели</h4>
+            <ul><li>Фокус на безопасности: <b>жёсткий геоблок</b> (нет СНГ) и <b>защита контента</b> (DMCA)</li></ul>
+          </div>
+          <div class="group">
+            <h4>Дорожная карта для модели</h4>
+            <div class="steps">
+              <span>14 дней на контент</span><i>→</i><span>верификации</span><i>→</i><span>тесты</span><i>→</i><span>3-й месяц: профит</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="block">
+        <button class="block-btn" type="button" aria-expanded="false" aria-controls="p3" id="h3">
+          <span class="node">Б3</span>
+          <span class="b-title"><h3>Конвейер контента</h3><p>Легенда, ТЗ на съёмку, аккаунты</p></span>
+          <span class="b-week">недели 2–3</span><span class="chev"></span>
+        </button>
+        <div class="panel" id="p3" role="region" aria-labelledby="h3" hidden>
+          <p class="key"><small>Ключевое</small>База контента на месяц вперёд</p>
+          <div class="group">
+            <h4>После утверждения модели: минимум 2–3 недели плотной подготовки</h4>
+            <div class="steps">
+              <span>Верификации</span><i>→</i><span>Контент-план</span><i>→</i><span>Съёмка базы на месяц вперёд</span><i>→</i><span>Упаковка профилей</span><i>→</i><span>Подбор подрядчиков по трафику</span>
+            </div>
+          </div>
+          <div class="group">
+            <ul>
+              <li><b>Анкетирование и распаковка личности</b></li>
+              <li>Создание «Легенды» (личного бренда) и стратегии инфлюенс-маркетинга</li>
+              <li>Подробные ТЗ для модели</li>
+              <li><b>Юридическая часть:</b> регистрация аккаунтов, верификации, платёжки</li>
+              <li>Обучение команды тому, как загружать, хранить и работать с контентом</li>
+              <li>Упаковка профилей по стратегии бренда для максимальной конверсии</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="block">
+        <button class="block-btn" type="button" aria-expanded="false" aria-controls="p4" id="h4">
+          <span class="node">Б4</span>
+          <span class="b-title"><h3>Инфраструктура и контроль</h3><p class="pit"><b>Подводный камень:</b> угон базы клиентами или чатерами</p></span>
+          <span class="b-week">неделя 4</span><span class="chev"></span>
+        </button>
+        <div class="panel" id="p4" role="region" aria-labelledby="h4" hidden>
+          <p class="key"><small>Подводный камень</small>Защита от угона базы клиентами или чатерами</p>
+          <div class="group">
+            <h4>Внедрение Onlymonster Browser</h4>
+            <ul>
+              <li>Создание аккаунта для вашего агентства</li>
+              <li>Подключение анкет</li>
+              <li>Добавление сотрудников и выдача доступов</li>
+              <li>Разбор менеджерских функций</li>
+              <li>Обучающие материалы для команды чатеров</li>
+            </ul>
+          </div>
+          <div class="group">
+            <h4>Иерархия доступов</h4>
+            <ul><li>Прозрачный контроль действий каждого сотрудника</li></ul>
+          </div>
+          <div class="group">
+            <h4>Практика</h4>
+            <ul><li>Обучение вашего тимлида на наших действующих анкетах, чтобы к 5-й неделе он участвовал в обучении команды чатеров</li></ul>
+          </div>
+          <p class="profit">Мы тесно сотрудничаем с Onlymonster.ai: участники закрытой фокус-группы получают круглосуточную тех-поддержку 24/7, личного менеджера и новые функции раньше остальных.</p>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ЭТАП 2 -->
+  <section class="stage" id="stage2">
+    <div class="stage-head">
+      <div class="stage-tag">Этап 2 · недели 5–10</div>
+      <h2>Запуск</h2>
+      <p class="stage-goal">Собрать отдел продаж, запустить трафик и выжать кассу.</p>
+    </div>
+    <div class="blocks">
+
+      <div class="block">
+        <button class="block-btn" type="button" aria-expanded="false" aria-controls="p5" id="h5">
+          <span class="node">Б5</span>
+          <span class="b-title"><h3>Отдел продаж</h3><p>Команда, регламенты, обучение чатеров</p></span>
+          <span class="b-week">недели 5–9</span><span class="chev"></span>
+        </button>
+        <div class="panel" id="p5" role="region" aria-labelledby="h5" hidden>
+          <p class="key"><small>Ключевое</small>Главные деньги приносят постоянные клиенты, «киты»</p>
+          <div class="group">
+            <h4>Архитектура команды</h4>
+            <div class="steps">
+              <span>Архитектура команды</span><i>→</i><span>Онбординг сотрудников</span><i>→</i><span>Регламенты для каждого отдела</span>
+            </div>
+          </div>
+          <div class="group">
+            <h4>Продажи</h4>
+            <ul>
+              <li>Внедрение воронки продаж</li>
+              <li>Протоколы работы с «китами»</li>
+            </ul>
+          </div>
+          <div class="group">
+            <h4>В обучение чатеров входит</h4>
+            <ul>
+              <li>Понимание продукта и аудитории</li>
+              <li>Правила общения с подписчиками</li>
+              <li>Продажи в переписке и работа с возражениями</li>
+              <li>Допродажи и повышение среднего чека</li>
+              <li>Удержание подписчиков</li>
+              <li>Контроль качества переписок и результатов</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="block">
+        <button class="block-btn" type="button" aria-expanded="false" aria-controls="p6" id="h6">
+          <span class="node">Б6</span>
+          <span class="b-title"><h3>Трафик и мотивация</h3><p class="pit"><b>Подводный камень:</b> слив бюджета на фейковый трафик и скам</p></span>
+          <span class="b-week">недели 5–9</span><span class="chev"></span>
+        </button>
+        <div class="panel" id="p6" role="region" aria-labelledby="h6" hidden>
+          <p class="key"><small>Подводный камень</small>Защита от слива бюджета на фейковый трафик и скам</p>
+          <div class="group">
+            <h4>Трафик</h4>
+            <ul>
+              <li>Подключение проверенных поставщиков трафика</li>
+              <li>Обучение ваших специалистов по трафику и передача им рабочих «связок»</li>
+              <li>Запуск каналов ручного трафика</li>
+              <li>ТЗ вашему IT-отделу на разработку софта; варианты аренды уже существующего проверенного софта</li>
+              <li>Прокачка анкет</li>
+            </ul>
+          </div>
+          <div class="group">
+            <h4>Мотивация</h4>
+            <ul>
+              <li>Система мотивации: KPI и % от продаж для роста чеков</li>
+              <li>Расчёт зарплат и процентов для персонала</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="block">
+        <button class="block-btn" type="button" aria-expanded="false" aria-controls="p7" id="h7">
+          <span class="node">Б7</span>
+          <span class="b-title"><h3>Тестовый режим</h3><p>Корректировка стратегии и докрутка конверсий</p></span>
+          <span class="b-week">неделя 10</span><span class="chev"></span>
+        </button>
+        <div class="panel" id="p7" role="region" aria-labelledby="h7" hidden>
+          <p class="key"><small>Ключевое</small>Стабильные прогнозируемые продажи</p>
+          <div class="group">
+            <ul>
+              <li>Работа в тестовом режиме</li>
+              <li>Корректировка стратегии</li>
+              <li>Докрутка конверсий</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ЭТАП 3 -->
+  <section class="stage" id="stage3">
+    <div class="stage-head">
+      <div class="stage-tag">Этап 3 · с 11-й недели</div>
+      <h2>Масштабирование</h2>
+      <p class="stage-goal">Переход к автономности и кратный рост.</p>
+    </div>
+    <div class="blocks">
+
+      <div class="block">
+        <button class="block-btn" type="button" aria-expanded="false" aria-controls="p8" id="h8">
+          <span class="node">Б8</span>
+          <span class="b-title"><h3>Клонирование актива</h3><p>Повтор по чек-листам до 4+ моделей</p></span>
+          <span class="b-week">11+ неделя</span><span class="chev"></span>
+        </button>
+        <div class="panel" id="p8" role="region" aria-labelledby="h8" hidden>
+          <p class="key"><small>Ключевое</small>Масштабирование до 4+ моделей</p>
+          <div class="group">
+            <ul>
+              <li>Текущая команда = <b>базовый юнит</b> (обслуживает 2 модели / 6 анкет)</li>
+              <li>Самостоятельное повторение Этапов 1 и 2 по готовым чек-листам</li>
+            </ul>
+          </div>
+          <div class="group">
+            <h4>Как масштабируется система</h4>
+            <ul>
+              <li>Процесс, который дал результат, не собирают заново: его описывают, закрепляют в инструкциях, передают новой команде и повторяют</li>
+              <li>Так агентство растёт через клонирование работающих процессов, а не через хаос и ручные решения</li>
+              <li>К 11-й неделе вы сами клонируете процесс на новых моделей</li>
+            </ul>
+          </div>
+          <div class="group">
+            <h4>Наша роль</h4>
+            <ul><li>Саппорт 24/7 и консультации на этапе вашего самостоятельного роста</li></ul>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ИТОГ -->
+  <section class="closing" id="closing">
+    <div class="stage-head">
+      <div class="stage-tag">Итог</div>
+      <h2>Подводные камни на карте</h2>
+      <p class="stage-goal">Здесь отмечены три подводных камня, которые видны с высоты. Внутри каждого блока нюансов больше, и многие проявляются только на практике.</p>
+    </div>
+    <ul class="pits">
+      <li><span>Б1</span>Ошибка в выборе модели: слив бюджета, разрушение команды, потеря «китов»</li>
+      <li><span>Б4</span>Угон базы клиентами или чатерами</li>
+      <li><span>Б6</span>Слив бюджета на фейковый трафик и скам</li>
+    </ul>
+    <p class="verdict">Дешевле пройти этот путь с готовыми решениями, чем платить за собственные ошибки.</p>
+  </section>
+</main>
+
+<script>
+(function () {
+  var buttons = document.querySelectorAll(".block-btn");
+  var toggleAll = document.getElementById("toggleAll");
+
+  function isOpen(b) { return b.getAttribute("aria-expanded") === "true"; }
+  function setOpen(btn, open) {
+    btn.setAttribute("aria-expanded", open ? "true" : "false");
+    document.getElementById(btn.getAttribute("aria-controls")).hidden = !open;
+  }
+  function syncToggleLabel() {
+    var anyOpen = Array.prototype.some.call(buttons, isOpen);
+    toggleAll.textContent = anyOpen ? "Свернуть все блоки" : "Развернуть все блоки";
+  }
+
+  buttons.forEach(function (btn) {
+    btn.addEventListener("click", function () {
+      setOpen(btn, !isOpen(btn));
+      syncToggleLabel();
+    });
+  });
+  toggleAll.addEventListener("click", function () {
+    var anyOpen = Array.prototype.some.call(buttons, isOpen);
+    buttons.forEach(function (b) { setOpen(b, !anyOpen); });
+    syncToggleLabel();
+  });
+
+  var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  document.querySelectorAll("[data-target]").forEach(function (el) {
+    el.addEventListener("click", function () {
+      var target = document.getElementById(el.getAttribute("data-target"));
+      if (target) target.scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "start" });
+    });
+  });
+
+  var bar = document.getElementById("stageBar");
+  var overview = document.getElementById("overview");
+  var stageBtns = document.querySelectorAll(".tl-stage");
+  var stages = Array.prototype.slice.call(document.querySelectorAll(".stage"));
+  function update() {
+    bar.classList.toggle("show", overview.getBoundingClientRect().bottom < 0);
+    var current = stages[0];
+    stages.forEach(function (s) {
+      if (s.getBoundingClientRect().top <= 160) current = s;
+    });
+    if (window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 4) {
+      current = stages[stages.length - 1];
+    }
+    stageBtns.forEach(function (sb) {
+      sb.setAttribute("aria-current", sb.getAttribute("data-target") === current.id ? "true" : "false");
+    });
+  }
+  window.addEventListener("scroll", update, { passive: true });
+  window.addEventListener("resize", update);
+  update();
+})();
+</script>
+
+</html>
